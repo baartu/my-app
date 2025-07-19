@@ -1,11 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import toast from 'react-hot-toast';
 import { useLanguage } from "../../contexts/LanguageContext";
 
-export default function ApplyPage() {
+function ApplyForm() {
   const { t } = useLanguage();
   const params = useSearchParams();
   const position = params.get("position") || "";
@@ -85,7 +85,7 @@ export default function ApplyPage() {
               onChange={handleChange}
               className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
               required
-              readOnly // değiştirilemez yap
+              readOnly
             />
           </div>
           <div>
@@ -117,5 +117,13 @@ export default function ApplyPage() {
         </form>
       </div>
     </section>
+  );
+}
+
+export default function ApplyPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ApplyForm />
+    </Suspense>
   );
 }
