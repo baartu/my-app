@@ -1,0 +1,26 @@
+/* client-logos-swiper.css */
+.client-logos-swiper {
+  height: 150px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #f3f4f6; /* Tailwind bg-gray-100 karşılığı */
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.client-logos-swiper .swiper-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  background: #f3f4f6;
+}
+
+.client-logos-swiper img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  display: block;
+  margin: auto;
+}
