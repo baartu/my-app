@@ -1,16 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  
-  // GitHub Pages için gerekli ayarlar
   basePath: process.env.NODE_ENV === 'production' ? '/my-app' : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? '/my-app/' : '',
   trailingSlash: true,
   output: 'export',
-  
-  // Images ayarları
   images: {
-    unoptimized: true, // GitHub Pages için gerekli
+    unoptimized: true,
     domains: ["localhost"],
     remotePatterns: [
       {
@@ -22,5 +18,6 @@ const nextConfig = {
     ],
   },
 };
+
 
 module.exports = nextConfig;
