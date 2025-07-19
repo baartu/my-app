@@ -1,18 +1,18 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { nanoid } from "nanoid";
+import { nanoid } from "nanoid"; 
 import MDEditor from '@uiw/react-md-editor';
 import { useLanguage } from "../contexts/LanguageContext"; 
 
 export default function AdminPanel() {
   const { t } = useLanguage();
-  
-  const MENU = [
+
+const MENU = [
     { key: "blog", label: t("admin.blog") },
     { key: "career", label: t("admin.career") },
     { key: "project", label: t("admin.project") },
     { key: "applications", label: t("admin.applications") },
-  ];
+];
 
 function BlogList() {
   type Blog = {
@@ -94,7 +94,7 @@ function BlogList() {
       .catch((err: any) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
-
+  
   // Blog düzenleme modalı açıldığında mevcut içeriği state'e ata
   useEffect(() => {
     if (showModal && editBlog) {

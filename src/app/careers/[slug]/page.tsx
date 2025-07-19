@@ -1,94 +1,114 @@
-"use client";
-
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { useLanguage } from "../../contexts/LanguageContext";
-import { useEffect, useState } from "react";
+import { getApiUrl, getImageUrl } from "../../lib/config";
 
 type Job = {
-  name: string;
-  type: string;
-  location: string;
-  content: string;
+  id: number;
+  name?: string;
+  description?: string;
+  requirements?: string;
+  responsibilities?: string;
+  location?: string;
+  type?: string;
+  salary?: string;
   image?: string;
+  slug?: string;
+  publishedAt?: string;
 };
 
-export default function CareerDetailPage({ params }: { params: { slug: string } }) {
-  const { t } = useLanguage();
-  const { slug } = params;
-  const [job, setJob] = useState<Job | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        const res = await fetch(`http://localhost:1337/api/careers?filters[slug][$eq]=${slug}&populate=*`);
-        if (!res.ok) {
-          notFound();
-        }
-
-        const data = await res.json();
-        const jobData = data.data && data.data[0];
-        if (!jobData) {
-          notFound();
-        }
-
-        // attributes varsa oradan, yoksa kökten al
-        const name = jobData.attributes ? jobData.attributes.name : jobData.name;
-        const type = jobData.attributes ? jobData.attributes.type : jobData.type;
-        const location = jobData.attributes ? jobData.attributes.location : jobData.location;
-        const content = jobData.attributes ? jobData.attributes.content : jobData.content;
-        const image = jobData.attributes && jobData.attributes.image && jobData.attributes.image.data
-          ? jobData.attributes.image.data.attributes.url
-          : null;
-
-        setJob({ name, type, location, content, image });
-        setLoading(false);
-      } catch (error) {
-        notFound();
-      }
-    };
-
-    fetchJob();
-  }, [slug]);
-
-  if (loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+async function getJob(slug: string): Promise<Job | null> {
+  try {
+    const res = await fetch(
+      getApiUrl(`/api/careers?filters[slug][$eq]=${slug}&populate=*`),
+      { cache: "no-store" }
+    );
+    const data = await res.json();
+    if (data?.data && data.data.length > 0) {
+      return data.data[0];
+    }
+    return null;
+  } catch (error) {
+    console.error("Job fetch error:", error);
+    return null;
   }
+}
+
+export async function generateStaticParams() {
+  return [];
+}
+
+export default async function CareerDetailPage({ params }: { params: { slug: string } }) {
+  const job = await getJob(params.slug);
 
   if (!job) return notFound();
 
   return (
-    <section className="max-w-2xl mx-auto px-4 py-16">
-      <div className="bg-white rounded-2xl shadow-lg p-8">
-        <h1 className="text-3xl font-bold mb-4 text-gray-800">{job.name}</h1>
-        <div className="flex flex-wrap gap-4 mb-6">
-          <span className="inline-block bg-blue-50 text-blue-700 px-4 py-1 rounded-full text-sm font-medium border border-blue-100">
-            <strong>{t("careers.type")}:</strong> {job.type}
-          </span>
-          <span className="inline-block bg-green-50 text-green-700 px-4 py-1 rounded-full text-sm font-medium border border-green-100">
-            <strong>{t("careers.location")}:</strong> {job.location}
-          </span>
-        </div>
+    <div className="max-w-4xl mx-auto px-4 py-16">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {job.image && (
-          <img src={job.image.startsWith("http") ? job.image : `http://localhost:1337${job.image}`} alt={job.name} className="mb-6 rounded-lg w-full object-cover max-h-64" />
+          <div className="relative h-64">
+            <img 
+              src={getImageUrl(job.image)} 
+              alt={job.name} 
+              className="w-full h-full object-cover"
+            />
+          </div>
         )}
-        <div className="prose prose-neutral mb-8 text-gray-700">
-          <p>{job.content}</p>
-          <p>
-            {t("careers.contactInfo")}{' '}
-            <Link href="/contact" className="text-blue-600 underline hover:text-blue-800 transition">
-              {t("careers.contactUs")}
-            </Link>.
-          </p>
+        
+        <div className="p-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{job.name}</h1>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-gray-700 mb-2">Location</h3>
+              <p className="text-gray-600">{job.location}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-gray-700 mb-2">Type</h3>
+              <p className="text-gray-600">{job.type}</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-gray-700 mb-2">Salary</h3>
+              <p className="text-gray-600">{job.salary}</p>
+            </div>
+          </div>
+
+          {job.description && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Description</h2>
+              <div className="prose prose-gray max-w-none">
+                <p className="text-gray-700 leading-relaxed">{job.description}</p>
+              </div>
+            </div>
+          )}
+
+          {job.requirements && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Requirements</h2>
+              <div className="prose prose-gray max-w-none">
+                <p className="text-gray-700 leading-relaxed">{job.requirements}</p>
+              </div>
+            </div>
+          )}
+
+          {job.responsibilities && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Responsibilities</h2>
+              <div className="prose prose-gray max-w-none">
+                <p className="text-gray-700 leading-relaxed">{job.responsibilities}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <a
+              href="/careers/apply"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Apply Now
+            </a>
+          </div>
         </div>
-        <Link
-          href={`/careers/apply?position=${encodeURIComponent(job.name)}`}
-          className="inline-block w-full bg-green-600 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow hover:bg-green-700 transition text-center"
-        >
-          {t("careers.applyForPosition")}
-        </Link>
       </div>
-    </section>
+    </div>
   );
 } 
