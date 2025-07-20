@@ -32,19 +32,7 @@ async function getProject(slug: string): Promise<Project | null> {
   }
 }
 
-async function getAllProjects(): Promise<Project[]> {
-  try {
-    const res = await fetch(getApiUrl("/api/projects?populate=*"), { cache: "no-store" });
-    const data = await res.json();
-    return data?.data || [];
-  } catch (error) {
-    console.error("Projects fetch error:", error);
-    return [];
-  }
-}
-
 export async function generateStaticParams() {
-  // Return empty array for static export - pages will be generated on demand
   return [];
 }
 

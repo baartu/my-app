@@ -23,12 +23,12 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Build project
-      run: npm run build
+    - name: Build and export project
+      run: npm run export
       
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./.next 
+        publish_dir: ./out 
